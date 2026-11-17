@@ -1,0 +1,517 @@
+/* =========================================================================
+   VibeShift — 3D depth layer, header chrome and responsive refinements.
+   Imported last in app/layout.tsx so it layers over marketplace.css and
+   editorial.css without editing them.
+   ========================================================================= */
+
+/* ---------- 1. Shell safety nets ---------- */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.marketplace-shell,
+.dashboard-shell {
+  /* `clip` contains the 3D layer without turning the page into a scroll box,
+     so the sticky header keeps working. */
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+.marketplace-shell :where(h1, h2, h3, p) {
+  overflow-wrap: break-word;
+}
+
+/* ---------- 2. Header chrome (classes referenced by the app shell) ---------- */
+
+.marketplace-header {
+  padding-top: env(safe-area-inset-top, 0px);
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.marketplace-header > div {
+  min-height: 62px;
+  padding-block: 10px;
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+.marketplace-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-liquid,
+.btn-hero-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0 0.95rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  transform: translateZ(0);
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
+}
+
+.btn-liquid {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #0a0a0b;
+}
+
+/* editorial.css repaints anything whose class attribute contains "bg-cyan-"
+   (including `hover:bg-cyan-200`), so the primary CTA needs a stronger rule. */
+.marketplace-shell a.btn-hero-solid,
+.marketplace-shell button.btn-hero-solid {
+  border-color: #2f80ff !important;
+  background-color: #2f80ff !important;
+  color: #ffffff !important;
+}
+
+.marketplace-shell a.btn-hero-solid:hover,
+.marketplace-shell button.btn-hero-solid:hover {
+  border-color: #1d6ae0 !important;
+  background-color: #1d6ae0 !important;
+  color: #ffffff !important;
+}
+
+/* Secondary CTA sits on the black hero, so it reads as a ghost button. */
+.marketplace-hero .hero-actions .btn-liquid {
+  border-color: rgb(255 255 255 / 32%) !important;
+  background-color: rgb(255 255 255 / 8%) !important;
+  color: #ffffff !important;
+}
+
+.marketplace-hero .hero-actions .btn-liquid:hover {
+  border-color: rgb(255 255 255 / 50%) !important;
+  background-color: rgb(255 255 255 / 14%) !important;
+}
+
+.btn-liquid:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.btn-hero-solid {
+  border: 1px solid #2f80ff;
+  background: #2f80ff;
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 28%), 0 8px 16px -10px rgb(47 128 255 / 80%);
+}
+
+.btn-hero-solid:hover {
+  border-color: #1d6ae0;
+  background: #1d6ae0;
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 32%), 0 12px 22px -12px rgb(47 128 255 / 90%);
+}
+
+.btn-liquid:active,
+.btn-hero-solid:active {
+  transform: translate3d(0, 1px, 0) scale(0.99);
+}
+
+/* Burger + drawer ------------------------------------------------ */
+
+.burger {
+  display: none;
+  width: 44px;
+  height: 44px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0a0a0b;
+  cursor: pointer;
+  z-index: 60;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.burger:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.burger-bar {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+body.menu-open .burger-bar:nth-child(1) {
+  transform: translateY(3.5px) rotate(45deg);
+}
+
+body.menu-open .burger-bar:nth-child(2) {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+.menu-backdrop {
+  display: none;
+}
+
+body.menu-open .menu-backdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgb(10 12 20 / 45%);
+  backdrop-filter: blur(2px);
+}
+
+@media (max-width: 1023px) {
+  .burger {
+    display: inline-flex;
+  }
+
+  /* The nav becomes a fixed drawer, so the three-track header would park the
+     burger in the centre column. Two tracks keep it right-aligned. */
+  .marketplace-header > div {
+    grid-template-columns: 1fr auto;
+  }
+
+  .marketplace-nav {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 55;
+    display: grid;
+    /* Without this the inherited `justify-self: center` shrink-wraps the
+       drawer to its content width instead of spanning the viewport. */
+    justify-self: stretch;
+    width: 100%;
+    gap: 0.6rem;
+    margin: 0;
+    padding: calc(env(safe-area-inset-top, 0px) + 4.85rem) clamp(1rem, 5vw, 1.75rem) 1.4rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 28px 48px -36px rgb(10 20 40 / 55%);
+    transform: translate3d(0, -101%, 0);
+    visibility: hidden;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+  }
+
+  body.menu-open .marketplace-nav {
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+  }
+
+  .marketplace-nav > * {
+    width: 100%;
+  }
+
+  .marketplace-nav .btn-liquid,
+  .marketplace-nav .btn-hero-solid {
+    width: 100%;
+    min-height: 48px;
+    justify-content: flex-start;
+    padding-inline: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .marketplace-nav > div > button {
+    width: 100%;
+    min-height: 48px;
+    justify-content: flex-start;
+  }
+}
+
+/* ---------- 3. Stats strip ---------- */
+
+.stats-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.1rem 2rem;
+  padding: 1.75rem clamp(1.25rem, 5vw, 2rem);
+  padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid #e2e8f0;
+  color: #0a0a0b;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.86rem;
+  letter-spacing: -0.01em;
+}
+
+.stat-icon-wide {
+  width: 38px;
+  height: 21px;
+  flex-shrink: 0;
+}
+
+/* ---------- 4. Hero 3D stage ---------- */
+
+.marketplace-hero {
+  --vs-3d: #2f80ff;
+  perspective: 1400px;
+}
+
+.hero-3d {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 1200px;
+  perspective-origin: 50% 42%;
+  transform-style: preserve-3d;
+}
+
+.hero-3d__glow {
+  position: absolute;
+  left: 50%;
+  top: -18%;
+  width: min(1180px, 128%);
+  height: 72%;
+  translate: -50% calc(var(--vs-depth-y, 0px) * 0.4);
+  border-radius: 50%;
+  background: radial-gradient(60% 60% at 50% 50%, rgb(47 128 255 / 26%) 0%, rgb(47 128 255 / 8%) 42%, transparent 74%);
+  filter: blur(18px);
+}
+
+.hero-3d__floor {
+  position: absolute;
+  left: 50%;
+  bottom: -34%;
+  width: 200%;
+  height: 118%;
+  translate: calc(-50% + var(--vs-depth-x, 0px)) calc(var(--vs-depth-y, 0px) * 0.6);
+  transform: rotateX(68deg);
+  transform-origin: 50% 100%;
+  background-image:
+    linear-gradient(to right, rgb(47 128 255 / 30%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 12%) 1px, transparent 1px);
+  background-size: 72px 72px, 72px 72px;
+  mask-image: radial-gradient(ellipse 62% 74% at 50% 100%, #000 0%, transparent 76%);
+  -webkit-mask-image: radial-gradient(ellipse 62% 74% at 50% 100%, #000 0%, transparent 76%);
+  opacity: 0.7;
+  animation: vs-floor-drift 26s linear infinite;
+}
+
+@keyframes vs-floor-drift {
+  to { background-position: 0 144px, 0 144px; }
+}
+
+/* Platform the search panel appears to float above (desktop only). */
+.hero-3d__stage,
+.hero-3d__stage-rim {
+  position: absolute;
+  right: clamp(1rem, 5vw, 4rem);
+  bottom: 6%;
+  width: min(46%, 520px);
+  aspect-ratio: 3 / 1;
+  translate: calc(var(--vs-depth-x, 0px) * 0.5) calc(var(--vs-depth-y, 0px) * 0.5);
+  border-radius: 50%;
+  transform: rotateX(72deg);
+  transform-origin: 50% 50%;
+}
+
+.hero-3d__stage {
+  background: radial-gradient(closest-side, rgb(47 128 255 / 22%) 0%, rgb(47 128 255 / 6%) 58%, transparent 78%);
+  box-shadow: inset 0 0 40px rgb(47 128 255 / 26%);
+}
+
+.hero-3d__stage-rim {
+  border: 1px solid rgb(47 128 255 / 34%);
+  box-shadow: 0 0 60px rgb(47 128 255 / 22%);
+  opacity: 0.85;
+}
+
+/* 3D treatment for the hero search panel and listing cards. */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .marketplace-hero form {
+    transform: perspective(1800px) rotateY(-7deg) rotateX(2.5deg);
+    transform-origin: 50% 60%;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    will-change: transform;
+  }
+
+  .marketplace-hero form:hover,
+  .marketplace-hero form:focus-within {
+    transform: perspective(1800px) rotateY(0deg) rotateX(0deg) translateY(-2px);
+  }
+}
+
+.marketplace-listing-card {
+  transform-style: preserve-3d;
+  transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.36s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .marketplace-shell .marketplace-listing-card:hover {
+    transform: perspective(1100px) rotateX(2.2deg) rotateY(-3.4deg) translate3d(0, -6px, 0);
+    box-shadow: 0 34px 60px -34px rgb(12 28 56 / 45%) !important;
+  }
+
+  .marketplace-shell .marketplace-listing-card:hover .marketplace-listing-card__surface {
+    transform: translateZ(14px);
+  }
+}
+
+.marketplace-listing-card__surface {
+  transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.marketplace-dialog[open] {
+  animation: vs-dialog-depth 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes vs-dialog-depth {
+  from {
+    opacity: 0;
+    transform: perspective(1600px) rotateX(7deg) translate3d(0, 16px, 0) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1600px) rotateX(0deg) translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* ---------- 5. Responsive refinements ---------- */
+
+@media (max-width: 1279px) {
+  .hero-3d__stage,
+  .hero-3d__stage-rim {
+    width: min(52%, 460px);
+    right: 2%;
+  }
+}
+
+@media (max-width: 1023px) {
+  .hero-3d__stage,
+  .hero-3d__stage-rim {
+    display: none;
+  }
+
+  .hero-3d__floor {
+    bottom: -46%;
+    height: 110%;
+    opacity: 0.55;
+  }
+}
+
+@media (max-width: 767px) {
+  .marketplace-hero {
+    perspective: none;
+  }
+
+  .hero-3d__glow {
+    top: -10%;
+    height: 62%;
+    opacity: 0.85;
+  }
+
+  .hero-3d__floor {
+    bottom: -40%;
+    background-size: 56px 56px, 56px 56px;
+    opacity: 0.45;
+  }
+}
+
+@media (max-width: 639px) {
+  .marketplace-hero h1 {
+    font-size: clamp(2rem, 9vw, 2.9rem);
+    line-height: 1.06;
+  }
+
+  .marketplace-hero h1 em {
+    display: inline;
+    /* Keep the emphasised phrase on one line instead of splitting it. */
+    white-space: nowrap;
+  }
+
+  /* 16px inputs stop iOS from zooming the viewport on focus. */
+  .marketplace-input,
+  .marketplace-select,
+  .market-filter-control,
+  .marketplace-shell input,
+  .marketplace-shell select,
+  .marketplace-shell textarea {
+    font-size: 16px;
+  }
+
+  .marketplace-dialog,
+  .marketplace-crew-dialog {
+    width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+
+  .marketplace-shell a,
+  .marketplace-shell button {
+    touch-action: manipulation;
+  }
+
+  .stats-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+
+  .stat {
+    white-space: normal;
+  }
+
+  .btn-hero-solid,
+  .btn-liquid {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 400px) {
+  .marketplace-header > div {
+    padding-inline: 0.9rem;
+  }
+
+  .marketplace-shell .text-5xl {
+    font-size: 2rem;
+  }
+}
+
+/* ---------- 6. Motion preferences ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-3d__floor,
+  .marketplace-dialog[open] {
+    animation: none;
+  }
+
+  .hero-3d__floor,
+  .hero-3d__glow,
+  .hero-3d__stage,
+  .hero-3d__stage-rim {
+    translate: none;
+  }
+
+  .marketplace-hero form,
+  .marketplace-hero form:hover,
+  .marketplace-hero form:focus-within,
+  .marketplace-shell .marketplace-listing-card:hover {
+    transform: none;
+  }
+}

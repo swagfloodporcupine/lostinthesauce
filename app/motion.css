@@ -1,0 +1,310 @@
+/* =========================================================================
+   VibeShift — motion layer: page transitions, category chips, loading
+   skeletons and the site-wide reduced-motion policy.
+   Imported last so it can steer editorial.css's blunt rules.
+   ========================================================================= */
+
+/* ---------- 1. Route transition ----------------------------------------- */
+
+.vs-route {
+  /* No fill mode on purpose: the transform must be gone once the animation
+     finishes, otherwise this wrapper would become the containing block for
+     the fixed mobile drawer. */
+  animation: vs-route-in 460ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes vs-route-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.vs-route__sweep {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 70;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, #2f80ff 42%, #9cc4ff 58%, transparent 100%);
+  animation: vs-route-sweep 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes vs-route-sweep {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+  20% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: 0 50%;
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- 2. Category chips ------------------------------------------- */
+
+.category-chip {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 280ms ease,
+    background-color 280ms ease,
+    color 280ms ease,
+    box-shadow 280ms ease;
+}
+
+.marketplace-shell .category-chip {
+  /* editorial.css pins anything with the `transition` class to 150ms. */
+  transition-duration: 300ms !important;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.category-chip svg {
+  transition: transform 340ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.marketplace-shell .category-chip svg {
+  transition-duration: 340ms !important;
+}
+
+/* Light sweeps across the chip on hover. */
+.category-chip::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(100deg, transparent 18%, rgb(47 128 255 / 16%) 50%, transparent 82%);
+  content: "";
+  translate: -130% 0;
+  transition: translate 620ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .marketplace-shell .category-chip:hover {
+    transform: translate3d(0, -5px, 0) scale(1.03);
+    border-color: #2f80ff !important;
+    background-color: rgb(47 128 255 / 10%) !important;
+    color: #2f80ff !important;
+    box-shadow: 0 18px 28px -18px rgb(47 128 255 / 95%), 0 0 0 3px rgb(47 128 255 / 14%);
+  }
+
+  .marketplace-shell .category-chip:hover::after {
+    translate: 130% 0;
+  }
+
+  .marketplace-shell .category-chip:hover svg {
+    transform: translateY(-2px) rotate(-9deg) scale(1.16);
+  }
+}
+
+.marketplace-shell .category-chip:active {
+  transform: translate3d(0, -1px, 0) scale(0.985);
+  box-shadow: 0 4px 10px -8px rgb(47 128 255 / 70%);
+}
+
+.marketplace-shell .category-chip:focus-visible {
+  border-color: #2f80ff !important;
+  outline: 2px solid #2f80ff;
+  outline-offset: 2px;
+}
+
+/* ---------- 3. Loading skeletons ---------------------------------------- */
+
+.vs-skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: #eef2f7;
+}
+
+.vs-skeleton::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgb(255 255 255 / 85%) 50%, transparent 100%);
+  content: "";
+  transform: translateX(-100%);
+  animation: vs-shimmer 1.35s ease-in-out infinite;
+}
+
+@keyframes vs-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.vs-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- 4. Auth forms ------------------------------------------------ */
+
+/* reference.css paints every input/select/textarea #0e0d14 and editorial.css
+   forces near-black text, which made the join and login fields unreadable.
+   These are white controls with dark text and a light native dropdown. */
+.auth-card input,
+.auth-card select,
+.auth-card textarea,
+.account-panel input,
+.account-panel select,
+.account-panel textarea {
+  min-height: 44px;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px;
+  background-color: #ffffff !important;
+  color: #0b1220 !important;
+  color-scheme: light;
+}
+
+.auth-card select {
+  appearance: none;
+  padding-right: 2.5rem !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.9rem center !important;
+  background-size: 15px !important;
+}
+
+.auth-card select option {
+  background-color: #ffffff;
+  color: #0b1220;
+}
+
+.auth-card input::placeholder,
+.auth-card textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.auth-card input:focus,
+.auth-card select:focus,
+.auth-card textarea:focus {
+  border-color: #2f80ff !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgb(47 128 255 / 18%) !important;
+}
+
+/* reference.css also paints the account cards #0e0d14 with dark text. */
+.account-grid > div {
+  border-color: #e2e8f0 !important;
+  background-color: #f8fafc !important;
+}
+
+.account-grid > div h2 {
+  color: #0b1220 !important;
+}
+
+.account-grid > div p {
+  color: #475569 !important;
+}
+
+/* .site-header had no layout rule, so the brand and its link ran together. */
+.site-header {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.account-role {
+  margin: 0 0 6px;
+  color: #2f80ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Shown instead of a broken image if a listing photo ever fails to load. */
+.vs-media-fallback {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #e9eefa 0%, #d6e2f5 46%, #c4d5ee 100%);
+}
+
+.vs-media-fallback::after {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(58% 68% at 28% 22%, rgb(255 255 255 / 72%), transparent 70%);
+  content: "";
+}
+
+/* ---------- 5. Reduced-motion policy ------------------------------------
+   editorial.css collapses every transition on the site to 0.01ms for
+   `prefers-reduced-motion: reduce` users, which removes all hover, focus and
+   navigation feedback. These are short, one-shot, non-vestibular cues, so the
+   durations are restored below. Continuous or large motion (hero floor drift,
+   pointer parallax, the intro's 3D flight) stays opt-out.
+   ------------------------------------------------------------------------ */
+
+/* Core interactions share one unhurried, consistent feel. */
+.marketplace-shell :is(.btn-liquid, .btn-hero-solid, .marketplace-listing-card, .marketplace-input, .market-filter-control, .marketplace-select),
+.dashboard-shell :is(.button, .marketplace-listing-card) {
+  transition-duration: 260ms !important;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: smooth !important;
+  }
+
+  .marketplace-shell *,
+  .marketplace-shell *::before,
+  .marketplace-shell *::after,
+  .dashboard-shell *,
+  .dashboard-shell *::before,
+  .dashboard-shell *::after,
+  .marketplace-header *,
+  .marketplace-header *::before,
+  .marketplace-header *::after,
+  .site-header *,
+  .site-header *::before,
+  .site-header *::after,
+  .auth-page *,
+  .auth-page *::before,
+  .auth-page *::after,
+  .account-shell *,
+  .account-shell *::before,
+  .account-shell *::after,
+  .vs-route *,
+  .vs-route *::before,
+  .vs-route *::after {
+    transition-duration: 240ms !important;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .vs-route {
+    animation-duration: 460ms !important;
+  }
+
+  .vs-route__sweep {
+    animation-duration: 900ms !important;
+  }
+
+  .vs-skeleton::after {
+    animation-duration: 1.35s !important;
+  }
+}

@@ -1,0 +1,166 @@
+/* =========================================================================
+   VibeShift — load-in intro.
+
+   Timeline (2.6s total):
+     0.20–1.14s  waveform bars fly in from depth and assemble
+     0.88–1.54s  "vibe" and "shift" slide together and settle their tracking
+     1.50–2.26s  the finished lockup does one full 360° spin with a small
+                 overshoot before it lands
+     2.34–2.60s  the curtain lifts
+
+   Pure CSS so it plays on the first paint and without JavaScript.
+   ========================================================================= */
+
+.vs-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 900px;
+  background: radial-gradient(115% 85% at 50% 40%, #16223a 0%, #070a10 55%, #000000 100%);
+  animation: vs-intro-veil 2.6s cubic-bezier(0.6, 0, 0.3, 1) both;
+}
+
+@keyframes vs-intro-veil {
+  0%,
+  90% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* --- the 360° landing spin ---------------------------------------------- */
+
+.vs-intro__lockup {
+  display: grid;
+  justify-items: center;
+  gap: 1.45rem;
+  transform-style: preserve-3d;
+  animation: vs-lockup-spin 0.76s cubic-bezier(0.5, 0, 0.35, 1) 1.5s both;
+}
+
+@keyframes vs-lockup-spin {
+  0% {
+    transform: rotateY(0deg) scale(0.9);
+  }
+  76% {
+    transform: rotateY(292deg) scale(1.04);
+  }
+  100% {
+    transform: rotateY(360deg) scale(1);
+  }
+}
+
+/* --- waveform mark assembling ------------------------------------------- */
+
+.vs-intro__mark {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 7px;
+  height: clamp(74px, 15vw, 104px);
+  transform-style: preserve-3d;
+}
+
+.vs-intro__bar {
+  display: block;
+  width: clamp(8px, 1.6vw, 13px);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #9cc4ff 0%, #2f80ff 52%, #1657ac 100%);
+  box-shadow: 0 0 22px rgb(47 128 255 / 45%);
+  transform-origin: 50% 100%;
+  animation: vs-bar-assemble 0.62s cubic-bezier(0.22, 1.25, 0.36, 1) both;
+}
+
+.vs-intro__bar:nth-child(1) { height: 40%; --x: -34px; --y: 38px; --r: -28deg; animation-delay: 0.2s; }
+.vs-intro__bar:nth-child(2) { height: 68%; --x: -16px; --y: -36px; --r: 20deg; animation-delay: 0.28s; }
+.vs-intro__bar:nth-child(3) { height: 100%; --x: 0px; --y: -54px; --r: -14deg; animation-delay: 0.36s; }
+.vs-intro__bar:nth-child(4) { height: 58%; --x: 18px; --y: 34px; --r: 18deg; animation-delay: 0.44s; }
+.vs-intro__bar:nth-child(5) { height: 30%; --x: 34px; --y: -22px; --r: -22deg; animation-delay: 0.52s; }
+
+@keyframes vs-bar-assemble {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--x, 0), var(--y, 30px), 130px) rotate(var(--r, 0deg)) scale(0.35);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+/* --- wordmark joining ---------------------------------------------------- */
+
+.vs-intro__word {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: clamp(1.85rem, 6vw, 2.55rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.vs-intro__word-piece {
+  display: inline-block;
+  animation: vs-word-join 0.56s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vs-intro__word-piece:first-child {
+  --join: -46px;
+  --tilt: -10deg;
+  animation-delay: 0.88s;
+}
+
+.vs-intro__word-piece:last-child {
+  --join: 46px;
+  --tilt: 10deg;
+  color: #2f80ff;
+  animation-delay: 0.98s;
+}
+
+@keyframes vs-word-join {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.12em;
+    transform: translate3d(var(--join, 0), 14px, 0) rotate(var(--tilt, 0deg));
+  }
+  100% {
+    opacity: 1;
+    letter-spacing: -0.045em;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+/* editorial.css collapses every animation on the page to 0.01ms for
+   reduced-motion users, which reduced this one-off brand intro to a single
+   frame. The intro is deliberate, plays once and is over in 2.6s, so its
+   timeline is re-asserted here for those users too. */
+@media (prefers-reduced-motion: reduce) {
+  .vs-intro {
+    animation-duration: 2.6s !important;
+  }
+
+  .vs-intro__lockup {
+    animation-duration: 0.76s !important;
+  }
+
+  .vs-intro__bar {
+    animation-duration: 0.62s !important;
+  }
+
+  .vs-intro__word-piece {
+    animation-duration: 0.56s !important;
+  }
+}

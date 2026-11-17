@@ -1,0 +1,57 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/next"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_next/image*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[redirects]]
+  from = "/login"
+  to = "/login"
+  status = 200
+
+[[redirects]]
+  from = "/join"
+  to = "/join"
+  status = 200
+
+[[redirects]]
+  from = "/account/*"
+  to = "/account/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard/*"
+  to = "/dashboard/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/directory/*"
+  to = "/directory/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/events/*"
+  to = "/events/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/vendors/*"
+  to = "/vendors/:splat"
+  status = 200
