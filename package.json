@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint ."
   },
+  "allowScripts": ["@netlify/next"],
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.57.0",
