@@ -36,7 +36,7 @@ export function VendorProfileDialog({ listing, inCrew, onClose, onToggleCrew }: 
           <div className="relative h-52 sm:h-64">
             <Image src={listing.image} alt={`${listing.category} work by ${listing.name}`} fill sizes="(max-width: 640px) 100vw, 760px" className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/90 via-neutral-950/15 to-neutral-950/15" />
-            <button type="button" aria-label="Close profile" className="absolute right-3 top-3 grid size-9 place-items-center rounded-lg border border-white/15 bg-neutral-950/75 text-white backdrop-blur" onClick={onClose}><X size={17} aria-hidden="true" /></button>
+            <button type="button" aria-label="Close profile" className="absolute right-3 top-3 grid size-10 place-items-center rounded-lg border border-white/15 bg-neutral-950/75 text-white backdrop-blur" onClick={onClose}><X size={17} aria-hidden="true" /></button>
             <div className="absolute bottom-4 left-5 right-5 flex items-end gap-3 sm:left-6 sm:right-6">
               <span className="relative grid size-14 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-neutral-900 bg-neutral-800 text-lg font-bold text-white">
                 {listing.avatarImage ? <Image src={listing.avatarImage} alt="" fill sizes="56px" className="object-cover" /> : listing.name.slice(0, 1).toUpperCase()}
@@ -115,8 +115,8 @@ export function VendorProfileDialog({ listing, inCrew, onClose, onToggleCrew }: 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-800 pt-5">
               <p className="text-sm font-semibold text-white">{listing.rateFrom === null ? "Rates available on request" : `From ${formatZar(listing.rateFrom)} / ${listing.rateUnit}`}</p>
               <div className="flex flex-wrap items-center gap-2">
-                <button type="button" aria-pressed={inCrew} onClick={() => onToggleCrew(listing)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-cyan-300/30 px-3 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-300/10">{inCrew ? <Check size={14} aria-hidden="true" /> : <Plus size={14} aria-hidden="true" />}{inCrew ? "Added to event crew" : "Add to event crew"}</button>
-                <Link href="/join" className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-cyan-300 px-4 text-sm font-bold text-neutral-950 transition hover:bg-cyan-200">Enquire<ArrowUpRight size={15} aria-hidden="true" /></Link>
+                <button type="button" aria-pressed={inCrew} onClick={() => onToggleCrew(listing)} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-cyan-300/30 px-4 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-300/10">{inCrew ? <Check size={14} aria-hidden="true" /> : <Plus size={14} aria-hidden="true" />}{inCrew ? "Added to event crew" : "Add to event crew"}</button>
+                <Link href="/join" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-cyan-300 px-5 text-sm font-bold text-neutral-950 transition hover:bg-cyan-200">Enquire<ArrowUpRight size={15} aria-hidden="true" /></Link>
               </div>
             </div>
           </div>

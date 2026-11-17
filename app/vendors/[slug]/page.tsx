@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
+  ArrowUpRight,
   BadgeCheck,
   CalendarClock,
   Check,
@@ -17,6 +18,7 @@ import { sampleListings } from "@/lib/mock-listings";
 import { formatZar, type PortfolioItem, type TechRiderItem } from "@/lib/directory-types";
 import { siteUrl } from "@/lib/site";
 import { VendorMediaKit } from "@/components/vendor-media-kit";
+import { SiteHeader } from "@/components/site-header";
 import { DEPOSIT_RATE, QUOTE_VALID_DAYS } from "@/lib/vendor-documents";
 
 export const dynamic = "force-dynamic";
@@ -242,46 +244,18 @@ export default async function VendorPage({
   return (
     <main className="marketplace-shell min-h-screen bg-neutral-950 text-neutral-100">
       {/* Header */}
-      <header className="marketplace-header sticky top-0 z-50 border-b border-neutral-800/90 bg-neutral-950/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-3 lg:px-8">
-          <Link
-            className="inline-flex items-center gap-2.5 text-xl font-extrabold tracking-tight text-white transition hover:opacity-90"
-            href="/"
-            aria-label="VibeShift home"
-          >
-            <svg
-              className="h-5 w-5 text-cyan-400 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M4 10v4" />
-              <path d="M8 6v12" />
-              <path d="M12 3v18" />
-              <path d="M16 8v8" />
-              <path d="M20 11v2" />
-            </svg>
-            <span>
-              vibe<span className="text-cyan-400">shift</span>
-            </span>
-          </Link>
-          <nav className="flex items-center gap-4 text-sm font-medium">
-            <Link href="/directory" className="text-neutral-300 transition hover:text-white">
-              Directory
-            </Link>
-            <Link
-              href="/join"
-              className="rounded-lg bg-cyan-400 px-3.5 py-1.5 text-xs font-bold text-neutral-950 transition hover:bg-cyan-300"
-            >
-              List Your Services
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader>
+        <Link href="/directory" className="text-neutral-300 transition hover:text-white">
+          Directory
+        </Link>
+        <Link href="/dashboard" className="text-neutral-300 transition hover:text-white">
+          Dashboard
+        </Link>
+        <Link href="/join" className="btn-hero-solid">
+          List Your Services
+          <ArrowUpRight size={13} aria-hidden="true" />
+        </Link>
+      </SiteHeader>
 
       {/* Profile Container */}
       <article className="mx-auto max-w-6xl px-5 py-10 lg:px-8">

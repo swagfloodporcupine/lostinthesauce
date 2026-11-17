@@ -82,7 +82,7 @@ export function VendorListingCard({ listing, inCrew, onSelect, onToggleCrew }: V
           <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-lime-300"><BadgeCheck size={13} aria-hidden="true" />Taking enquiries</span>
           <div className="flex items-center gap-3">
             <Link href={`/vendors/${listing.slug}`} className="text-xs font-semibold text-neutral-300 transition hover:text-white">View profile <span aria-hidden="true">↗</span></Link>
-            <button type="button" aria-pressed={inCrew} onClick={() => onToggleCrew(listing)} className={`grid size-8 place-items-center rounded-md border transition ${inCrew ? "border-lime-300/30 bg-lime-300/10 text-lime-200" : "border-cyan-300/30 bg-cyan-300/10 text-cyan-100 hover:border-cyan-200/60"}`} aria-label={inCrew ? `Remove ${listing.name} from event crew` : `Add ${listing.name} to event crew`} title={inCrew ? "Remove from event crew" : "Add to event crew"}>{inCrew ? <Check size={15} aria-hidden="true" /> : <Plus size={15} aria-hidden="true" />}</button>
+            <button type="button" aria-pressed={inCrew} onClick={() => onToggleCrew(listing)} className={`grid size-10 place-items-center rounded-md border transition ${inCrew ? "border-lime-300/30 bg-lime-300/10 text-lime-200" : "border-cyan-300/30 bg-cyan-300/10 text-cyan-100 hover:border-cyan-200/60"}`} aria-label={inCrew ? `Remove ${listing.name} from event crew` : `Add ${listing.name} to event crew`} title={inCrew ? "Remove from event crew" : "Add to event crew"}>{inCrew ? <Check size={15} aria-hidden="true" /> : <Plus size={15} aria-hidden="true" />}</button>
           </div>
         </div>
       </div>

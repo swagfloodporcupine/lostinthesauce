@@ -17,7 +17,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { DirectoryFilters } from "@/components/directory-filters";
-import { EventCrewBuilder } from "@/components/event-crew-builder";
 import { VendorListingCard } from "@/components/vendor-listing-card";
 import { VendorProfileDialog } from "@/components/vendor-profile-dialog";
 import { CategoryBar } from "@/components/category-bar";
@@ -30,6 +29,7 @@ import {
   type PriceRange,
   type VendorListing,
 } from "@/lib/directory-types";
+import { useCrew } from "@/lib/crew-store";
 import { sampleListings } from "@/lib/mock-listings";
 
 
@@ -96,7 +96,7 @@ export default function HomeMarketplace({ liveListings }: { liveListings: LiveLi
   const [gearQuery, setGearQuery] = useState("");
   const [availabilityDate, setAvailabilityDate] = useState("");
   const [selectedListing, setSelectedListing] = useState<VendorListing | null>(null);
-  const [crewListingIds, setCrewListingIds] = useState<string[]>([]);
+  const { isInCrew, toggleListing } = useCrew();
   const keywordInputRef = useRef<HTMLInputElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -145,7 +145,6 @@ export default function HomeMarketplace({ liveListings }: { liveListings: LiveLi
   }, []);
 
   const listings = [...sampleListings, ...liveListings.map(liveToListing).filter((listing): listing is VendorListing => listing !== null)];
-  const crewListings = listings.filter((listing) => crewListingIds.includes(listing.id));
 
   useEffect(() => {
     function focusSearch(event: KeyboardEvent) {
@@ -180,12 +179,6 @@ export default function HomeMarketplace({ liveListings }: { liveListings: LiveLi
     setAvailabilityDate("");
   }
 
-  function toggleCrewListing(listing: VendorListing) {
-    setCrewListingIds((current) => current.includes(listing.id)
-      ? current.filter((id) => id !== listing.id)
-      : [...current, listing.id]);
-  }
-
   return (
     <main className="marketplace-shell min-h-screen bg-neutral-950 text-neutral-100">
       <header className="marketplace-header sticky top-0 z-50 border-b border-neutral-800/90 bg-neutral-950/85 backdrop-blur-md">
@@ -202,7 +195,6 @@ export default function HomeMarketplace({ liveListings }: { liveListings: LiveLi
           </Link>
           <nav id="site-nav" className="marketplace-nav justify-self-center flex items-center gap-3" aria-label="Primary">
             <Link className="btn-liquid appear" style={{"--d":"0.16s"} as React.CSSProperties} href="/dashboard" onClick={closeMenu}>Dashboard</Link>
-            <div className="appear" style={{"--d":"0.28s"} as React.CSSProperties}><EventCrewBuilder listings={crewListings} onRemove={(id) => setCrewListingIds((current) => current.filter((itemId) => itemId !== id))} /></div>
             <Link className="btn-hero-solid appear" style={{"--d":"0.34s"} as React.CSSProperties} href="/join" onClick={closeMenu}>List Your Services<ArrowUpRight size={13} aria-hidden="true" /></Link>
           </nav>
           <div className="justify-self-end flex items-center gap-3">
@@ -260,13 +252,13 @@ export default function HomeMarketplace({ liveListings }: { liveListings: LiveLi
 
         {visibleListings.length ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {visibleListings.map((listing) => <VendorListingCard key={listing.id} listing={listing} inCrew={crewListingIds.includes(listing.id)} onSelect={setSelectedListing} onToggleCrew={toggleCrewListing} />)}
+            {visibleListings.map((listing) => <VendorListingCard key={listing.id} listing={listing} inCrew={isInCrew(listing.id)} onSelect={setSelectedListing} onToggleCrew={toggleListing} />)}
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-neutral-700 bg-neutral-900/40 px-6 py-16 text-center"><Sparkles className="mx-auto mb-4 text-cyan-300" size={24} aria-hidden="true" /><h3 className="text-lg font-semibold text-white">No matches this time.</h3><p className="mt-2 text-sm text-neutral-400">Try another category, keyword, gear requirement or event date.</p><button type="button" className="mt-5 rounded-lg border border-neutral-700 px-4 py-2 text-sm font-semibold text-neutral-200 transition hover:border-cyan-300/50 hover:text-white" onClick={clearFilters}>Clear filters</button></div>
         )}
 
-        <VendorProfileDialog listing={selectedListing} inCrew={selectedListing ? crewListingIds.includes(selectedListing.id) : false} onClose={() => setSelectedListing(null)} onToggleCrew={toggleCrewListing} />
+        <VendorProfileDialog listing={selectedListing} inCrew={selectedListing ? isInCrew(selectedListing.id) : false} onClose={() => setSelectedListing(null)} onToggleCrew={toggleListing} />
       </section>
 
       <section className="stats-footer">

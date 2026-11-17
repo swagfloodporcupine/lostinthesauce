@@ -7,6 +7,8 @@ import "./responsive-3d.css";
 import "./load-intro.css";
 import "./motion.css";
 import { LoadIntro } from "@/components/load-intro";
+import { EventCrewBuilder } from "@/components/event-crew-builder";
+import { CrewProvider } from "@/lib/crew-store";
 import { organizationId, site, siteUrl, websiteId } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -132,8 +134,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
       </head>
       <body>
-        <LoadIntro />
-        {children}
+        <CrewProvider>
+          <LoadIntro />
+          {children}
+          <EventCrewBuilder />
+        </CrewProvider>
       </body>
     </html>
   );

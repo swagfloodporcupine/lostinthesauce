@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { BookingAgreementPanel } from "@/components/booking-agreement-panel";
 import type { BookingAgreement } from "@/lib/agreement-types";
+import { useCrew } from "@/lib/crew-store";
 import { formatZar, type VendorListing } from "@/lib/directory-types";
 
 type CrewMessage = {
@@ -29,11 +30,6 @@ type QuoteDraft = {
   notes: string;
 };
 
-type EventCrewBuilderProps = {
-  listings: VendorListing[];
-  onRemove: (listingId: string) => void;
-};
-
 function todayLocal(): string {
   const now = new Date();
   const offset = now.getTimezoneOffset() * 60_000;
@@ -44,7 +40,8 @@ function messageTime(): string {
   return new Date().toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" });
 }
 
-export function EventCrewBuilder({ listings, onRemove }: EventCrewBuilderProps) {
+export function EventCrewBuilder() {
+  const { listings, count, removeListing, clear } = useCrew();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [eventName, setEventName] = useState("");
@@ -150,13 +147,17 @@ export function EventCrewBuilder({ listings, onRemove }: EventCrewBuilderProps) 
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-cyan-300/30 bg-cyan-300/10 px-3 text-xs font-semibold text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-300/15 sm:text-sm"
+        className="crew-fab"
         aria-haspopup="dialog"
-        aria-label={`Open event crew builder, ${listings.length} vendors selected`}
+        aria-label={`Open event crew checkout, ${count} ${count === 1 ? "vendor" : "vendors"} selected`}
       >
-        <ShoppingBag size={16} aria-hidden="true" />
-        <span className="hidden sm:inline">Event crew</span>
-        <span className="grid min-w-5 place-items-center rounded-full bg-cyan-300 px-1.5 text-[10px] font-bold text-neutral-950">{listings.length}</span>
+        <span className="crew-fab__icon" aria-hidden="true">
+          <ShoppingBag size={20} />
+        </span>
+        <span className="crew-fab__label">Event crew</span>
+        {count > 0 && (
+          <span className="crew-fab__badge" aria-hidden="true">{count}</span>
+        )}
       </button>
 
       <dialog
@@ -169,10 +170,10 @@ export function EventCrewBuilder({ listings, onRemove }: EventCrewBuilderProps) 
         <div className="max-h-[calc(100dvh-32px)] overflow-y-auto rounded-xl border border-neutral-700 bg-neutral-950 shadow-2xl shadow-black/60">
           <header className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-neutral-800 bg-neutral-950/95 px-5 py-4 backdrop-blur sm:px-6">
             <div>
-              <h2 id="crew-builder-title" className="text-xl font-semibold text-white">Event Crew Builder</h2>
-              <p className="mt-1 text-xs text-neutral-500">Build one supplier list for your event.</p>
+              <h2 id="crew-builder-title" className="text-xl font-semibold text-white">Event Crew Checkout</h2>
+              <p className="mt-1 text-xs text-neutral-500">Plan one crew list, negotiate rates and confirm your event.</p>
             </div>
-            <button type="button" aria-label="Close event crew builder" className="grid size-9 shrink-0 place-items-center rounded-lg border border-neutral-800 text-neutral-300 hover:border-neutral-600 hover:text-white" onClick={() => setIsOpen(false)}><X size={17} aria-hidden="true" /></button>
+            <button type="button" aria-label="Close event crew checkout" className="crew-icon-btn grid size-10 shrink-0 place-items-center rounded-lg border border-neutral-800 text-neutral-300 hover:border-neutral-600 hover:text-white" onClick={() => setIsOpen(false)}><X size={17} aria-hidden="true" /></button>
           </header>
 
           <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,.95fr)]">
@@ -194,7 +195,7 @@ export function EventCrewBuilder({ listings, onRemove }: EventCrewBuilderProps) 
                     <article key={listing.id} className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">{listing.category}</p><h4 className="mt-1 truncate text-sm font-semibold text-white">{listing.name}</h4><p className="mt-1 text-xs text-neutral-500">{listing.area}, {listing.locationCode}</p></div>
-                        <div className="flex shrink-0 items-center gap-2"><span className="text-xs font-semibold text-neutral-200">{listing.rateFrom === null ? "Quote needed" : `From ${formatZar(listing.rateFrom)}`}</span><button type="button" aria-label={`Remove ${listing.name} from event crew`} onClick={() => onRemove(listing.id)} className="grid size-8 place-items-center rounded-md text-neutral-500 transition hover:bg-neutral-800 hover:text-rose-300"><Trash2 size={15} aria-hidden="true" /></button></div>
+                        <div className="flex shrink-0 items-center gap-2"><span className="text-xs font-semibold text-neutral-200">{listing.rateFrom === null ? "Quote needed" : `From ${formatZar(listing.rateFrom)}`}</span><button type="button" aria-label={`Remove ${listing.name} from event crew`} onClick={() => removeListing(listing.id)} className="crew-icon-btn grid size-10 place-items-center rounded-md text-neutral-500 transition hover:bg-neutral-800 hover:text-rose-300"><Trash2 size={15} aria-hidden="true" /></button></div>
                       </div>
 
                       <div className="mt-4 border-t border-neutral-800 pt-3">
@@ -210,7 +211,7 @@ export function EventCrewBuilder({ listings, onRemove }: EventCrewBuilderProps) 
                         </div> : <p className="text-xs text-neutral-500">No equipment checklist has been supplied for this listing.</p>}
                       </div>
 
-                      <button type="button" onClick={() => beginNegotiation(listing)} className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-md border border-neutral-700 px-3 text-xs font-semibold text-neutral-200 transition hover:border-cyan-300/50 hover:text-cyan-100"><MessageSquareText size={14} aria-hidden="true" />{activeListingId === listing.id ? "Negotiation open" : "Open quote thread"}</button>
+                      <button type="button" onClick={() => beginNegotiation(listing)} className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-md border border-neutral-700 px-3 text-xs font-semibold text-neutral-200 transition hover:border-cyan-300/50 hover:text-cyan-100"><MessageSquareText size={14} aria-hidden="true" />{activeListingId === listing.id ? "Negotiation open" : "Open quote thread"}</button>
                     </article>
                   ))}
                 </div> : <div className="rounded-lg border border-dashed border-neutral-700 px-5 py-9 text-center"><PackageCheck className="mx-auto mb-3 text-neutral-600" size={23} aria-hidden="true" /><h4 className="text-sm font-semibold text-neutral-200">Your crew is empty</h4><p className="mt-1 text-xs text-neutral-500">Add a DJ, crew member or venue from any directory card.</p></div>}
@@ -235,7 +236,7 @@ export function EventCrewBuilder({ listings, onRemove }: EventCrewBuilderProps) 
                       <label className="grid gap-1.5 text-xs font-medium text-neutral-400"><span className="inline-flex items-center gap-1"><Clock3 size={12} aria-hidden="true" />Duration (hours)</span><input className="market-filter-control" type="number" min="1" max="24" step="0.5" value={activeDraft.duration} onChange={(event) => updateQuoteDraft("duration", event.target.value)} /></label>
                       <label className="col-span-2 grid gap-1.5 text-xs font-medium text-neutral-400">Custom notes<textarea className="market-filter-control min-h-20 resize-y py-2" value={activeDraft.notes} onChange={(event) => updateQuoteDraft("notes", event.target.value)} placeholder="Set times, load-in, travel or other requirements" /></label>
                     </div>
-                    <button type="button" onClick={sendProposal} className="inline-flex min-h-9 items-center gap-2 rounded-md bg-cyan-300 px-3 text-xs font-bold text-neutral-950 transition hover:bg-cyan-200"><Send size={13} aria-hidden="true" />Send revised proposal</button>
+                    <button type="button" onClick={sendProposal} className="inline-flex min-h-10 items-center gap-2 rounded-md bg-cyan-300 px-3 text-xs font-bold text-neutral-950 transition hover:bg-cyan-200"><Send size={13} aria-hidden="true" />Send revised proposal</button>
                     {proposalSent[activeListing.id] && <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-semibold text-lime-300"><Check size={12} aria-hidden="true" />Proposal added to thread</span>}
 
                     <div className="border-t border-neutral-800 pt-3">
@@ -270,7 +271,13 @@ export function EventCrewBuilder({ listings, onRemove }: EventCrewBuilderProps) 
             </div>
           </div>
 
-          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-800 bg-neutral-950 px-5 py-4 sm:px-6"><p className="text-xs text-neutral-500">Vendor replies and final rates are confirmed directly with each supplier.</p><button type="button" onClick={() => setIsOpen(false)} className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-neutral-700 px-3 text-xs font-semibold text-neutral-200 hover:border-neutral-500"><X size={13} aria-hidden="true" />Close builder</button></footer>
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-800 bg-neutral-950 px-5 py-4 sm:px-6">
+            <p className="text-xs text-neutral-500">Vendor replies and final rates are confirmed directly with each supplier.</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {listings.length > 0 && <button type="button" onClick={clear} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-neutral-800 px-3 text-xs font-semibold text-neutral-400 hover:border-rose-300/40 hover:text-rose-300"><Trash2 size={13} aria-hidden="true" />Clear crew</button>}
+              <button type="button" onClick={() => setIsOpen(false)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-neutral-700 px-3 text-xs font-semibold text-neutral-200 hover:border-neutral-500"><X size={13} aria-hidden="true" />Close</button>
+            </div>
+          </footer>
         </div>
       </dialog>
     </>
