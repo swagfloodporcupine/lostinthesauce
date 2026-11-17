@@ -38,7 +38,7 @@ export function DashboardShell() {
       </section>
 
       <div className="mx-auto max-w-7xl px-5 pb-16 lg:px-8">
-        <div role="tabpanel" aria-label={view === "vendor" ? "Vendor Hub" : "Client Events"}>
+        <div key={view} role="tabpanel" aria-label={view === "vendor" ? "Vendor Hub" : "Client Events"} className="vs-view">
           {view === "vendor" ? <VendorDashboard /> : <ClientDashboard />}
         </div>
       </div>

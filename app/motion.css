@@ -159,6 +159,198 @@
   border: 0;
 }
 
+/* ---------- 4. Staggered reveal ------------------------------------------
+   marketplace-home.tsx paints every headline, button and link with
+   `.appear style="--d:<n>s"` and swaps in `.is-in` on animationend so the
+   transform is removed cleanly. The keyframes were missing, so every reveal
+   was silently skipped — the elements just sat at opacity 1 the whole time.
+   ------------------------------------------------------------------------ */
+.appear {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  animation: vs-appear var(--d, 0.2s) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.appear.is-in {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes vs-appear {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Directory/category grids render cards with no entrance motion at all —
+   they just pop in. Wrapping the grid in `.vs-list` and giving each child an
+   index (`--i`) staggers them up the column, so a 6-card grid feels like a
+   cascade instead of a wall. */
+.vs-list {
+  display: contents;
+}
+
+.vs-list > * {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  animation: vs-list-in 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+@keyframes vs-list-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vs-list > * {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ---------- 6. Dialogs ----------------------------------------------------
+   responsive-3d.css already animates the dialog body on [open] with a
+   perspective+scale entrance. What was missing was any backdrop motion —
+   the scrim just snapped in and out under the native <dialog> close path.
+   Give the backdrop its own quick fade so the whole thing feels like one
+   element instead of a card materialising over a hard cut.
+   ------------------------------------------------------------------------ */
+.marketplace-dialog::backdrop {
+  animation: vs-dialog-backdrop 260ms ease both;
+}
+
+@keyframes vs-dialog-backdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-dialog::backdrop {
+    animation: none;
+  }
+}
+
+/* ---------- 7. Dashboard view switch -------------------------------------
+   The Vendor Hub / Client Events tabs swapped their content with no motion
+   at all — the new view just appeared. A quick cross-fade keeps the tab
+   switch readable instead of abrupt, and it works for any content because
+   it is opacity-only (no layout shift).
+   ------------------------------------------------------------------------ */
+.vs-view {
+  animation: vs-view-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes vs-view-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vs-view {
+    animation-duration: 0.01ms !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ---------- 8. Crew toast feedback ---------------------------------------
+   Adding/removing a vendor from the crew used to just mutate state with no
+   confirmation — you could not tell whether the click landed. A small toast
+   pinned to the FAB confirms the action and slides up out of the way.
+   ------------------------------------------------------------------------ */
+.crew-toast-stack {
+  position: fixed;
+  right: 1.25rem;
+  /* Stack up just above the floating crew FAB so the two never collide. */
+  bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+@media (max-width: 639px) {
+  .crew-toast-stack {
+    right: 1rem;
+    bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.crew-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 12px 28px -16px rgb(0 0 0 / 90%);
+  animation: vs-toast-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.crew-toast--added {
+  border-color: rgb(52 211 153 / 55%);
+  background: rgb(16 185 129 / 92%);
+}
+
+.crew-toast--removed {
+  border-color: rgb(251 113 133 / 55%);
+  background: rgb(244 63 94 / 92%);
+}
+
+.crew-toast--cleared {
+  border-color: rgb(251 191 36 / 55%);
+  background: rgb(245 158 11 / 92%);
+}
+
+@keyframes vs-toast-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crew-toast,
+  .appear {
+    animation-duration: 0.01ms !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 /* ---------- 4. Auth forms ------------------------------------------------ */
 
 /* reference.css paints every input/select/textarea #0e0d14 and editorial.css

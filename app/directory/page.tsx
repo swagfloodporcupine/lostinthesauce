@@ -89,14 +89,15 @@ export default function DirectoryPage() {
         </div>
 
         {/* Category Cards Overview */}
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {listingCategories.map((category) => {
+        <div className="vs-list mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {listingCategories.map((category, index) => {
             const meta = categoryMeta[category];
             const Icon = meta?.icon || Sparkles;
             const slug = meta?.slug || category.toLowerCase().replace(/\s+/g, "-");
             return (
               <Link
                 key={category}
+                style={{"--i": index} as React.CSSProperties}
                 href={`/directory/${slug}`}
                 className="group relative rounded-xl border border-neutral-800 bg-neutral-900/50 p-5 transition hover:border-cyan-400/50 hover:bg-neutral-900/80"
               >
@@ -135,15 +136,16 @@ export default function DirectoryPage() {
           <h2 className="text-2xl font-bold text-white">All Cape Town Suppliers</h2>
           <span className="text-xs text-neutral-400">Sorted by relevance & rating</span>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {sampleListings.map((listing) => (
-            <VendorListingCard
-              key={listing.id}
-              listing={listing}
-              inCrew={isInCrew(listing.id)}
-              onSelect={() => {}}
-              onToggleCrew={toggleListing}
-            />
+        <div className="vs-list grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          {sampleListings.map((listing, index) => (
+            <div key={listing.id} style={{"--i": index} as React.CSSProperties}>
+              <VendorListingCard
+                listing={listing}
+                inCrew={isInCrew(listing.id)}
+                onSelect={() => {}}
+                onToggleCrew={toggleListing}
+              />
+            </div>
           ))}
         </div>
       </section>

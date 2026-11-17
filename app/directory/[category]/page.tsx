@@ -102,15 +102,16 @@ export default function CategoryPage({
       {/* Listings Grid */}
       <section className="mx-auto max-w-7xl px-5 pb-20 lg:px-8">
         {listings.length ? (
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {listings.map((listing) => (
-              <VendorListingCard
-                key={listing.id}
-                listing={listing}
-                inCrew={isInCrew(listing.id)}
-                onSelect={() => {}}
-                onToggleCrew={toggleListing}
-              />
+          <div className="vs-list grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {listings.map((listing, index) => (
+              <div key={listing.id} style={{"--i": index} as React.CSSProperties}>
+                <VendorListingCard
+                  listing={listing}
+                  inCrew={isInCrew(listing.id)}
+                  onSelect={() => {}}
+                  onToggleCrew={toggleListing}
+                />
+              </div>
             ))}
           </div>
         ) : (

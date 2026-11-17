@@ -30,6 +30,12 @@ type QuoteDraft = {
   notes: string;
 };
 
+type CrewToast = {
+  id: string;
+  tone: "added" | "removed" | "cleared";
+  text: string;
+};
+
 function todayLocal(): string {
   const now = new Date();
   const offset = now.getTimezoneOffset() * 60_000;
@@ -55,6 +61,8 @@ export function EventCrewBuilder() {
   const [provisioned, setProvisioned] = useState<Record<string, Record<string, boolean>>>({});
   const [proposalSent, setProposalSent] = useState<Record<string, boolean>>({});
   const [agreements, setAgreements] = useState<Record<string, BookingAgreement>>({});
+  const [toasts, setToasts] = useState<CrewToast[]>([]);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -67,6 +75,21 @@ export function EventCrewBuilder() {
   const activeDraft = activeListing ? quoteDrafts[activeListing.id] : undefined;
   const estimatedTotal = listings.reduce((sum, listing) => sum + (listing.rateFrom ?? 0), 0);
   const pricedCount = listings.filter((listing) => listing.rateFrom !== null).length;
+
+  function pushToast(tone: CrewToast["tone"], text: string) {
+    const id = crypto.randomUUID();
+    setToasts((current) => [...current, { id, tone, text }]);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => {
+      setToasts((current) => current.filter((toast) => toast.id !== id));
+    }, 2400);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
 
   function beginNegotiation(listing: VendorListing) {
     setActiveListingId(listing.id);
@@ -142,8 +165,26 @@ export function EventCrewBuilder() {
     ].join("\n");
   }
 
+  function removeWithToast(listing: VendorListing) {
+    removeListing(listing.id);
+    pushToast("removed", `${listing.name} removed from crew`);
+  }
+
+  function clearWithToast() {
+    clear();
+    pushToast("cleared", "Event crew cleared");
+  }
+
   return (
     <>
+      <div className="crew-toast-stack" aria-live="polite">
+        {toasts.map((toast) => (
+          <div key={toast.id} className={`crew-toast crew-toast--${toast.tone}`}>
+            <Check size={14} aria-hidden="true" />
+            <span>{toast.text}</span>
+          </div>
+        ))}
+      </div>
       <button
         type="button"
         onClick={() => setIsOpen(true)}
@@ -195,7 +236,7 @@ export function EventCrewBuilder() {
                     <article key={listing.id} className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">{listing.category}</p><h4 className="mt-1 truncate text-sm font-semibold text-white">{listing.name}</h4><p className="mt-1 text-xs text-neutral-500">{listing.area}, {listing.locationCode}</p></div>
-                        <div className="flex shrink-0 items-center gap-2"><span className="text-xs font-semibold text-neutral-200">{listing.rateFrom === null ? "Quote needed" : `From ${formatZar(listing.rateFrom)}`}</span><button type="button" aria-label={`Remove ${listing.name} from event crew`} onClick={() => removeListing(listing.id)} className="crew-icon-btn grid size-10 place-items-center rounded-md text-neutral-500 transition hover:bg-neutral-800 hover:text-rose-300"><Trash2 size={15} aria-hidden="true" /></button></div>
+                        <div className="flex shrink-0 items-center gap-2"><span className="text-xs font-semibold text-neutral-200">{listing.rateFrom === null ? "Quote needed" : `From ${formatZar(listing.rateFrom)}`}</span><button type="button" aria-label={`Remove ${listing.name} from event crew`} onClick={() => removeWithToast(listing)} className="crew-icon-btn grid size-10 place-items-center rounded-md text-neutral-500 transition hover:bg-neutral-800 hover:text-rose-300"><Trash2 size={15} aria-hidden="true" /></button></div>
                       </div>
 
                       <div className="mt-4 border-t border-neutral-800 pt-3">
@@ -274,7 +315,7 @@ export function EventCrewBuilder() {
           <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-800 bg-neutral-950 px-5 py-4 sm:px-6">
             <p className="text-xs text-neutral-500">Vendor replies and final rates are confirmed directly with each supplier.</p>
             <div className="flex flex-wrap items-center gap-2">
-              {listings.length > 0 && <button type="button" onClick={clear} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-neutral-800 px-3 text-xs font-semibold text-neutral-400 hover:border-rose-300/40 hover:text-rose-300"><Trash2 size={13} aria-hidden="true" />Clear crew</button>}
+              {listings.length > 0 && <button type="button" onClick={clearWithToast} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-neutral-800 px-3 text-xs font-semibold text-neutral-400 hover:border-rose-300/40 hover:text-rose-300"><Trash2 size={13} aria-hidden="true" />Clear crew</button>}
               <button type="button" onClick={() => setIsOpen(false)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-neutral-700 px-3 text-xs font-semibold text-neutral-200 hover:border-neutral-500"><X size={13} aria-hidden="true" />Close</button>
             </div>
           </footer>
