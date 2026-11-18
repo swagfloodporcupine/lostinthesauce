@@ -1,7 +1,7 @@
 -- VibeShift relational marketplace foundation
 create extension if not exists pgcrypto;
 create type public.account_type as enum ('planner','vendor','admin');
-create type public.vendor_category as enum ('dj','live_act','mc','photographer','videographer','sound_pa','sound_engineer','lighting','stage_set','venue');
+create type public.vendor_category as enum ('dj-and-entertainment','venues-and-accommodation','catering-and-beverages','photography-and-videography','sound-lighting-and-av','staging-and-production','furniture-and-equipment-rentals','decor-and-floristry','event-staffing-and-security','transport-and-logistics');
 create type public.booking_status as enum ('inquiry','quoted','pending','confirmed','completed','cancelled');
 create type public.event_status as enum ('draft','open','planning','confirmed','completed','cancelled');
 
