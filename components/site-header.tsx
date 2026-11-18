@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type SiteHeaderProps = {
   children: ReactNode;
@@ -57,17 +58,20 @@ export function SiteHeader({ children, navLabel = "Primary" }: SiteHeaderProps) 
         <nav id="site-nav" className="marketplace-nav justify-self-center flex items-center gap-3" aria-label={navLabel}>
           {children}
         </nav>
-        <button
-          className="burger justify-self-end"
-          type="button"
-          aria-controls="site-nav"
-          aria-expanded={menuOpen}
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          onClick={toggleMenu}
-        >
-          <span className="burger-bar" />
-          <span className="burger-bar" />
-        </button>
+        <div className="justify-self-end flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            className="burger"
+            type="button"
+            aria-controls="site-nav"
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            onClick={toggleMenu}
+          >
+            <span className="burger-bar" />
+            <span className="burger-bar" />
+          </button>
+        </div>
       </div>
       <div className="menu-backdrop" onClick={closeMenu} />
     </header>

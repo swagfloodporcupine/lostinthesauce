@@ -9,6 +9,7 @@ import "./motion.css";
 import { LoadIntro } from "@/components/load-intro";
 import { EventCrewBuilder } from "@/components/event-crew-builder";
 import { CrewProvider } from "@/lib/crew-store";
+import { Providers } from "@/components/providers";
 import { organizationId, site, siteUrl, websiteId } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -134,11 +135,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
       </head>
       <body>
-        <CrewProvider>
-          <LoadIntro />
-          {children}
-          <EventCrewBuilder />
-        </CrewProvider>
+        <Providers>
+          <CrewProvider>
+            <LoadIntro />
+            {children}
+            <EventCrewBuilder />
+          </CrewProvider>
+        </Providers>
       </body>
     </html>
   );

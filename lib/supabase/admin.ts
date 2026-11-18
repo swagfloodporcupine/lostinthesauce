@@ -13,5 +13,5 @@ if (!url || !key) {
 // the demo-session cookie (HMAC-signed, not Supabase Auth) to real auth users,
 // and every inbox read/write must work for whichever role is at the desk.
 export const adminClient = createClient(url, key, {
-  auth: { persistSession: false, autoRefreshSession: false },
+  auth: { persistSession: false, autoRefreshToken: false },
 });

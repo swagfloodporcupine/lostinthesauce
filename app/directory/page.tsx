@@ -10,41 +10,35 @@ import { listingCategories } from "@/lib/directory-types";
 import { useCrew } from "@/lib/crew-store";
 
 const categoryMeta: Record<string, { icon: any; count: number; desc: string; slug: string }> = {
-  DJs: {
+  "DJs and Entertainment": {
     icon: Music2,
-    count: sampleListings.filter((l) => l.category === "DJs").length,
+    count: sampleListings.filter((l) => l.category === "DJs and Entertainment").length,
     desc: "Club, wedding and underground vinyl selectors",
-    slug: "djs",
+    slug: "djs-and-entertainment",
   },
-  "Sound Engineers": {
+  "Sound, Lighting and AV": {
     icon: Lightbulb,
-    count: sampleListings.filter((l) => l.category === "Sound Engineers").length,
+    count: sampleListings.filter((l) => l.category === "Sound, Lighting and AV").length,
     desc: "FOH, monitor and live line-check sound techs",
-    slug: "sound-engineers",
+    slug: "sound-lighting-and-av",
   },
-  Lighting: {
+  "Staging and Production": {
     icon: Building2,
-    count: sampleListings.filter((l) => l.category === "Lighting").length,
+    count: sampleListings.filter((l) => l.category === "Staging and Production").length,
     desc: "Moving heads, DMX rigging and stage illumination",
-    slug: "lighting",
+    slug: "staging-and-production",
   },
-  Photographers: {
+  "Photography and Videography": {
     icon: Camera,
-    count: sampleListings.filter((l) => l.category === "Photographers").length,
+    count: sampleListings.filter((l) => l.category === "Photography and Videography").length,
     desc: "Event, crowd and low-light visual photographers",
-    slug: "photographers",
+    slug: "photography-and-videography",
   },
-  Videographers: {
-    icon: Video,
-    count: sampleListings.filter((l) => l.category === "Videographers").length,
-    desc: "4K recap reels, aftermovies and multicam crews",
-    slug: "videographers",
-  },
-  Venues: {
+  "Venues and Accommodation": {
     icon: Building2,
-    count: sampleListings.filter((l) => l.category === "Venues").length,
+    count: sampleListings.filter((l) => l.category === "Venues and Accommodation").length,
     desc: "Rooftops, warehouses and outdoor garden spaces",
-    slug: "venues",
+    slug: "venues-and-accommodation",
   },
 };
 

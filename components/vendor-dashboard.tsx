@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowDownRight, ArrowUpRight, CalendarDays, Check, ChevronLeft, ChevronRight, Clock3, Eye, MessageSquareText, ToggleLeft, ToggleRight } from "lucide-react";
 import { formatZar } from "@/lib/directory-types";
+import { adminClient } from "@/lib/supabase/admin";
 
 type BookingRequest = {
   id: string;
@@ -22,18 +23,6 @@ type Payout = {
   status: "Paid" | "Processing";
 };
 
-const initialRequests: BookingRequest[] = [
-  { id: "req-1", client: "Harbour Lights Events", event: "Summer launch", date: "2026-12-19", area: "Woodstock", amount: 3500, status: "New inquiry" },
-  { id: "req-2", client: "The Glasshouse", event: "Friday late set", date: "2026-12-05", area: "Woodstock", amount: 2800, status: "Quote sent" },
-  { id: "req-3", client: "Northline Studio", event: "Brand gathering", date: "2026-11-28", area: "City Bowl", amount: 2500, status: "Confirmed" },
-];
-
-const initialPayouts: Payout[] = [
-  { id: "pay-1", booking: "Northline Studio · Brand gathering", amount: 2500, date: "2026-11-28", status: "Processing" },
-  { id: "pay-2", booking: "Sunday Sessions · Sea Point", amount: 3200, date: "2026-11-08", status: "Paid" },
-  { id: "pay-3", booking: "Rooftop Social · City Bowl", amount: 1800, date: "2026-10-24", status: "Paid" },
-];
-
 function localDateKey(date: Date): string {
   const offset = date.getTimezoneOffset() * 60_000;
   return new Date(date.getTime() - offset).toISOString().slice(0, 10);
@@ -43,17 +32,46 @@ function dateLabel(date: string): string {
   return new Date(`${date}T12:00:00`).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" });
 }
 
-export function VendorDashboard() {
-  const [acceptingRequests, setAcceptingRequests] = useState(true);
-  const [blockedDates, setBlockedDates] = useState<string[]>(["2026-11-21", "2026-11-29"]);
-  const [requests, setRequests] = useState(initialRequests);
-  const [month, setMonth] = useState(() => {
-    const date = new Date();
-    return new Date(date.getFullYear(), date.getMonth(), 1);
-  });
-  const [viewCount, setViewCount] = useState(1284);
-  const [inquiryCount] = useState(23);
-  const [payouts] = useState(initialPayouts);
+async function loadRequestsFromSupabase(profileId: string): Promise<BookingRequest[]> {
+  try {
+    const { data, error } = await adminClient
+      .from("event_vendor_requests")
+      .select(`
+        id,
+        listing:vendor_listings!inner(name, category, rate_from, rate_to, rate_unit),
+        event:events!inner(title, event_date, city, status),
+        profile:profiles!inner(display_name, account_type)
+      `)
+      .eq("vendor_id", profileId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    return (data ?? []).map((req: any) => ({
+      id: req.id,
+      client: req.profile.display_name || "Planner",
+      event: req.event?.title || "Unknown event",
+      date: req.event?.event_date || new Date().toISOString().slice(0, 10),
+      area: req.event?.city || "Cape Town",
+      amount: req.listing?.rate_from || 0,
+      status: req.status,
+    }));
+  } catch (err) {
+    console.error("[vendor-dashboard] Failed to load requests:", err);
+    return [];
+  }
+}
+
+async function loadPayoutsFromSupabase(profileId: string): Promise<Payout[]> {
+  try {
+    // In a real implementation, we'd have a payouts table linked to confirmed bookings
+    // For now, return mock data with note
+    return [];
+  } catch (err) {
+    console.error("[vendor-dashboard] Failed to load payouts:", err);
+    return [];
+  }
+}
 
   const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
   const firstWeekday = firstDay.getDay();

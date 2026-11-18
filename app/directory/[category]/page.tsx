@@ -15,14 +15,16 @@ import {
 import { useCrew } from "@/lib/crew-store";
 
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
-  DJs: "Professional Cape Town club, wedding and festival DJs with verified gear, mixes and transparent rates.",
-  "Sound Engineers": "FOH and monitor engineers, PA systems, live line-checks and acoustics specialists in Cape Town.",
-  Lighting: "Stage lighting rigs, moving heads, architectural uplighting, lasers and DMX controllers.",
-  Photographers: "Event photographers capturing live moments, nightlife, weddings and corporate gatherings.",
-  Videographers: "Cinema-grade event videographers, aftermovies, recap reels and multi-cam recordings.",
-  Venues: "Cape Town event venues, warehouses, rooftops, outdoor lawns and private hire spaces.",
-  "Photography & Video": "Top visual creators, event photographers and videographers across the Western Cape.",
-  "Event Crews": "Turnkey technical and production crews for live music, festivals and corporate productions.",
+  "DJs and Entertainment": "Professional Cape Town club, wedding and festival DJs with verified gear, mixes and transparent rates.",
+  "Sound, Lighting and AV": "FOH and monitor engineers, PA systems, live line-checks and acoustics specialists in Cape Town.",
+  "Staging and Production": "Stage lighting rigs, moving heads, architectural uplighting, lasers and DMX controllers.",
+  "Photography and Videography": "Event photographers and videographers capturing live moments, nightlife, weddings and corporate gatherings.",
+  "Venues and Accommodation": "Cape Town event venues, warehouses, rooftops, outdoor lawns and private hire spaces.",
+  "Catering and Beverages": "Professional catering, bars, food trucks and beverage services for events across Cape Town.",
+  "Furniture and Equipment Rentals": "Furniture, staging, AV equipment and production gear rentals for events.",
+  "Decor and Floristry": "Event styling, floral design, draping, and decorative installations.",
+  "Event Staffing and Security": "Event crew, security personnel, wait staff, and production teams.",
+  "Transport and Logistics": "Event transport, logistics, equipment delivery and crew shuttles.",
 };
 
 export default function CategoryPage({
@@ -38,9 +40,6 @@ export default function CategoryPage({
 
   const listings: VendorListing[] = sampleListings.filter((l) => {
     if (!targetCategory || targetCategory === "All") return true;
-    if (targetCategory === ("Photography & Video" as any)) {
-      return l.category === "Photographers" || l.category === "Videographers";
-    }
     return (
       l.category.toLowerCase() === targetCategory.toLowerCase() ||
       l.category.toLowerCase().replaceAll(" ", "-") === category.toLowerCase()

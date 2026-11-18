@@ -55,7 +55,7 @@ function liveToListing(live: LiveListing): VendorListing | null {
     gear: [],
     rateFrom: live.rateFrom,
     rateTo: live.rateTo,
-    rateUnit: category === "DJs" ? "set" : "booking",
+    rateUnit: category === "DJs and Entertainment" ? "set" : "booking",
     image: live.coverImageUrl || fallbackImage,
     avatarImage: live.avatarUrl,
     verified: Boolean(live.verifiedAt),

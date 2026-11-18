@@ -102,7 +102,8 @@ export async function getMessages(
 
   if (error || !data) return [];
 
-  return (data as Array<MessageRow & { profiles: { display_name: string | null } | null }>).map(
+  // Supabase returns profiles as an array (to-many syntax), take first element
+  return (data as Array<MessageRow & { profiles: Array<{ display_name: string | null }> | null }>).map(
     (m) => ({
       id: m.id,
       conversation_id: m.conversation_id,
@@ -110,7 +111,7 @@ export async function getMessages(
       body: m.body,
       read_at: m.read_at,
       created_at: m.created_at,
-      sender_name: m.profiles?.display_name?.trim() || "Someone",
+      sender_name: m.profiles?.[0]?.display_name?.trim() || "Someone",
     }),
   );
 }

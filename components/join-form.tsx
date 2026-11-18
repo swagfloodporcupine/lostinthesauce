@@ -20,32 +20,6 @@ export function JoinForm() {
     setBusy(true);
     setMessage("");
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    const supabaseReady = Boolean(url && key && !url.includes("YOUR_PROJECT"));
-
-    if (supabaseReady) {
-      try {
-        const { createClient } = await import("@/lib/supabase/client");
-        const supabase = createClient();
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { display_name: name, account_type: role } },
-        });
-        if (error) throw error;
-        setMessage("Account created. Check your email to confirm before signing in.");
-        setMessageType("success");
-        setBusy(false);
-        return;
-      } catch (err) {
-        setMessage(err instanceof Error ? err.message : "Unable to create account.");
-        setMessageType("error");
-        setBusy(false);
-        return;
-      }
-    }
-
     const result = await signUpAction({ name, email, password, role });
     if (!result.ok) {
       setMessage(result.message);
@@ -56,6 +30,7 @@ export function JoinForm() {
 
     setMessage("Account created. Opening your account…");
     setMessageType("success");
+    setBusy(false);
     window.location.assign("/account");
   }
 

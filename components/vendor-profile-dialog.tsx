@@ -80,7 +80,7 @@ export function VendorProfileDialog({ listing, inCrew, onClose, onToggleCrew }: 
               ) : <p className="rounded-lg border border-dashed border-neutral-700 p-5 text-sm text-neutral-500">Portfolio media has not been added yet.</p>}
             </section>
 
-            {listing.category === "DJs" && (
+            {listing.category === "DJs and Entertainment" && (
               <section className="rounded-lg border border-neutral-800 bg-neutral-950/70 p-4">
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4">
                   <div className="grid size-10 shrink-0 place-items-center rounded-full bg-cyan-300/15 text-cyan-200"><AudioLines size={18} aria-hidden="true" /></div>

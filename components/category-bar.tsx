@@ -4,10 +4,15 @@ import Link from "next/link";
 import {
   Sparkles,
   Music2,
-  Lightbulb,
+  Utensils,
   Building2,
   Camera,
-  Video,
+  AudioWaveform,
+  Clapperboard,
+  Armchair,
+  Flower,
+  ShieldCheck,
+  Truck,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -18,12 +23,16 @@ import {
 
 export const categoryIcons: Record<CategoryFilter, LucideIcon> = {
   All: Sparkles,
-  DJs: Music2,
-  "Sound Engineers": Lightbulb,
-  Lighting: Building2,
-  Photographers: Camera,
-  Videographers: Video,
-  Venues: Building2,
+  "DJs and Entertainment": Music2,
+  "Venues and Accommodation": Building2,
+  "Catering and Beverages": Utensils,
+  "Photography and Videography": Camera,
+  "Sound, Lighting and AV": AudioWaveform,
+  "Staging and Production": Clapperboard,
+  "Furniture and Equipment Rentals": Armchair,
+  "Decor and Floristry": Flower,
+  "Event Staffing and Security": ShieldCheck,
+  "Transport and Logistics": Truck,
 };
 
 export function getCategoryHref(category: CategoryFilter): string {
