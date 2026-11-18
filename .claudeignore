@@ -1,0 +1,8 @@
+# Heavy build/dependency folders ignored by Claude Code search & file tools.
+node_modules/
+dist/
+build/
+.next/
+.git/
+coverage/
+__pycache__/
